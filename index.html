@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#12284c">
+<title>LifeGrid AI – Smart Emergency Assistance</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>LifeGrid AI</h1>
+  <p>One Tap. Live Location. Faster Help.</p>
+</header>
+
+<nav id="nav">
+  <button data-t="home" class="on">🏠 Home</button>
+  <button data-t="profile">👤 Profile</button>
+  <button data-t="talk">🗣️ Speak</button>
+  <button data-t="blood">🩸 Blood</button>
+  <button data-t="hosp">🏥 Hospitals</button>
+  <button data-t="aid">⛑️ First Aid</button>
+  <button data-t="log">🔔 Alerts</button>
+</nav>
+
+<main>
+  <section id="home" class="tab on">
+    <button id="sos" aria-label="Emergency help"><b>EMERGENCY</b><b>HELP</b><small>Tap once</small></button>
+    <p id="loc" class="note">📍 Location not shared yet</p>
+    <div class="row">
+      <a class="btn red" href="tel:112">📞 Call 112</a>
+      <a class="btn red" href="tel:108">🚑 Call 108</a>
+    </div>
+
+    <div class="card">
+      <h3>Live location</h3>
+      <p id="live" class="note">Not tracking</p>
+      <button class="btn ok" id="track">📡 Start live location</button>
+      <a id="lmap" class="btn" target="_blank" rel="noopener" href="#" hidden>🗺️ Open on map</a>
+    </div>
+
+    <div class="card">
+      <h3>Smart triggers</h3>
+      <label class="sw"><input type="checkbox" id="fall"> Fall detection</label>
+      <label class="sw"><input type="checkbox" id="shake"> Shake phone 5 times for help</label>
+      <label class="sw"><input type="checkbox" id="voice"> Say “help” or “உதவி”</label>
+      <p class="note">These work while this page stays open on your phone.</p>
+    </div>
+
+    <div class="card">
+      <h3>Daily check-in</h3>
+      <p id="ci" class="note"></p>
+      <button class="btn ok" id="checkin">✅ I am OK today</button>
+    </div>
+
+    <div class="card">
+      <h3>Siren</h3>
+      <button class="btn" id="siren">🔊 Start siren</button>
+    </div>
+  </section>
+
+  <section id="profile" class="tab">
+    <form id="pform" class="card">
+      <h3>Emergency profile</h3>
+      <div class="ph">
+        <img id="pv" alt="Profile photo">
+        <label class="btn">📷 Add photo<input type="file" id="photo" accept="image/*" hidden></label>
+      </div>
+      <input id="name" placeholder="Full name" required>
+      <div class="row">
+        <input id="age" type="number" min="1" max="120" placeholder="Age" required>
+        <select id="gender"><option value="">Gender</option><option>Female</option><option>Male</option><option>Other</option></select>
+      </div>
+      <select id="bg" required></select>
+      <textarea id="address" rows="2" placeholder="Home address"></textarea>
+      <textarea id="medical" rows="2" placeholder="Medical conditions"></textarea>
+      <input id="allergy" placeholder="Allergies">
+      <h4>Emergency contacts</h4>
+      <input id="c1n" placeholder="Contact 1 name">
+      <input id="c1p" type="tel" placeholder="Contact 1 phone" pattern="[0-9+ ]{10,15}" required>
+      <input id="c2n" placeholder="Contact 2 name">
+      <input id="c2p" type="tel" placeholder="Contact 2 phone" pattern="[0-9+ ]{10,15}">
+      <button class="btn ok" type="submit">💾 Save profile</button>
+      <button class="btn" type="button" id="newp">➕ Add another person</button>
+      <button class="btn" type="button" id="qrb">🔳 Make emergency QR card</button>
+      <div id="qrn" hidden>
+        <div id="qr"></div>
+        <p class="note">Print this. Anyone who scans it sees your emergency details.</p>
+      </div>
+    </form>
+    <div id="plist"></div>
+  </section>
+
+  <section id="talk" class="tab">
+    <div class="card">
+      <h3>Tap to speak for me</h3>
+      <div class="row">
+        <button class="chip on" data-l="en">English</button>
+        <button class="chip" data-l="ta">தமிழ்</button>
+      </div>
+      <div id="saybox" class="say">Tap a picture below</div>
+      <div id="tiles" class="tiles"></div>
+    </div>
+  </section>
+
+  <section id="blood" class="tab">
+    <div class="card">
+      <h3>Blood finder</h3>
+      <p class="note">Tap a blood group to see saved people with that group.</p>
+      <div id="chips" class="chips"></div>
+      <div id="bres"></div>
+      <a class="btn red" target="_blank" rel="noopener" href="https://www.google.com/maps/search/blood+bank+near+me">🩸 Find blood banks near me</a>
+    </div>
+  </section>
+
+  <section id="hosp" class="tab">
+    <div class="card">
+      <h3>Nearby hospitals</h3>
+      <button class="btn ok" id="findh">📍 Find hospitals near me</button>
+      <div id="mapbox"></div>
+      <div id="hl"></div>
+    </div>
+  </section>
+
+  <section id="aid" class="tab"><div id="aidl"></div></section>
+
+  <section id="log" class="tab">
+    <div class="row"><h3>Alert history</h3><button class="mini del" id="clr">Clear all</button></div>
+    <div id="alist"></div>
+  </section>
+</main>
+
+<div id="ov">
+  <div class="box">
+    <div id="cdwrap">
+      <h2>Sending alert in <span id="cdn">10</span> s</h2>
+      <p id="why" class="note"></p>
+      <button class="btn big white" id="now">Send now</button>
+      <button class="btn" id="cancel">I am safe – cancel</button>
+    </div>
+    <div id="res"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
